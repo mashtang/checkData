@@ -266,8 +266,16 @@ class Checkdata():
                             t_dist = math.sqrt(t_diff1*t_diff1+t_diff2*t_diff2);
                             t_distSum += t_dist
 
+                    id = v[0]['_id']
+                    db.carSrcContent.update({'_id':id},{'$push':{'dedup.local_class_span':t_distSum, "dedup.local_deduplication_count":t_raptime, "partProcessFlag":2, "partDupFlag":0}})
+
+                    for i in range(0,iCount-1):
+                        for j in range(i+1, iCount):
+                            if t_similarMatrix[i][j] == 1 and t_similarMatrix[j][i] == 1:
+                                db.carSrcContent.update({'_id':id},{'$push':{'dedup.local_class_span':t_distSum, "dedup.local_deduplication_count":t_raptime, "partProcessFlag":2, "partDupFlag":id}})
+
                 else:
-                    id = v['id']
+                    id = v[0]['_id']
                     db.carSrcContent.update({'_id':id},{'$push':{'dedup.local_class_span':1, "dedup.local_deduplication_count":1, "partProcessFlag":2, "partDupFlag":0}})
 
             iItems = db.carSrcContent.find({'exceptionFlag':'normal', 'dedup.part_deduplication_flag':1, 'partProcessFlag':[0,2]}).limit(1000)
