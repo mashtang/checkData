@@ -3,6 +3,7 @@ __author__ = 'tangmash'
 import pymongo
 import time
 from datetime import *
+import math
 
 class Checkdata():
 
@@ -221,6 +222,8 @@ class Checkdata():
 
             for k,v in iVehiDic.items():
                 iSize = len(v)
+                t_raptime = 0#重复次数
+                t_distSum = 0#内部距离
                 if iSize > 1:
                     iCount = iSize
                     t_similarMatrix = self.genMatrix(iSize,iSize)
@@ -246,6 +249,23 @@ class Checkdata():
                         for j in range(i+1, iCount):
                             if t_similarMatrix[i][j] == 1 and t_similarMatrix[j][j+1] == 1:
                                 t_similarMatrix[i][j+1] = 1
+
+                    #计算重复
+                    for i in range(0,iCount-1):
+                        for j in range(i+1, iCount):
+                            if t_similarMatrix[i][j] == 1 and t_similarMatrix[j][i] == 1:
+                                t_raptime +=0
+
+                    #计算步数
+                    for i in range(0,iCount-1):
+                        t_info1 = v[i]
+                        for j in range(i+1, iCount):
+                            t_info2 = v[j]
+                            t_diff1 = (abs(t_info1['price'] - t_info2['price'])*1)/min(t_info1['price'], t_info2['price'])*100000;
+                            t_diff2 = abs(t_info1['mileage'] - t_info2['mileage']);
+                            t_dist = math.sqrt(t_diff1*t_diff1+t_diff2*t_diff2);
+                            t_distSum += t_dist
+
                 else:
                     id = v['id']
                     db.carSrcContent.update({'_id':id},{'$push':{'dedup.local_class_span':1, "dedup.local_deduplication_count":1, "partProcessFlag":2, "partDupFlag":0}})
