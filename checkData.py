@@ -17,155 +17,156 @@ class Checkdata():
         db = conn.kkcrawler
         data = db.carSrcContent.find_one({'exceptionFlag':''})
         id = data['_id']
-        #cityId = data["cityId"]
-        #处理city相关字段
-        if data['city_id'] is not None:
-            if data["city_id"] >= 1 and data["city_id"] <= 363:
+        while data:
+            #处理city相关字段
+            if data['city_id'] is not None:
+                if data["city_id"] >= 1 and data["city_id"] <= 363:
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "city_id")
+            else:
+                self.sign = False
+                self.addExceptionNone(db, id, "city_name")
+
+            #处理ouBasicColor相关字段
+            if data['color_id'] is not None:
+                if data["color_id"] >= 1 and data["color_id"] <= 15:
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "city_id")
+            else:
+                self.sign = False
+                self.addExceptionNone(db, id, "city_id")
+
+            #site_model_id 局部车型Id
+            if data['site_model_id'] is not None and data['site_model_id'] != "":
                 pass
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "city_id")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "city_name")
+                self.addExceptionNone(db, id, "site_model_id")
 
-        #处理ouBasicColor相关字段
-        if data['color_id'] is not None:
-            if data["color_id"] >= 1 and data["color_id"] <= 15:
+            #dealer_site_id 局部车商Id
+            if data['dealer_site_id'] is not None and data['site_model_id'] != "":
                 pass
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "city_id")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "city_id")
+                self.addExceptionNone(db, id, "dealer_site_id")
 
-        #site_model_id 局部车型Id
-        if data['site_model_id'] is not None and data['site_model_id'] != "":
-            pass
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "site_model_id")
-
-        #dealer_site_id 局部车商Id
-        if data['dealer_site_id'] is not None and data['site_model_id'] != "":
-            pass
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "dealer_site_id")
-
-        #site 网站Id
-        if data['site'] is not None and data['site'] != "":
-            pass
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "site")
-
-        #mileage 公里数
-        if data['mileage'] is not None:
-            if data["mileage"] >= 0 and data["mileage"] <= 5000000:
+            #site 网站Id
+            if data['site'] is not None and data['site'] != "":
                 pass
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "mileage")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "mileage")
+                self.addExceptionNone(db, id, "site")
 
-        #price 价格
-        if data['price'] is not None:
-            if data["price"] >= 0 and data["price"] <= 10000000:
-                pass
+            #mileage 公里数
+            if data['mileage'] is not None:
+                if data["mileage"] >= 0 and data["mileage"] <= 5000000:
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "mileage")
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "price")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "price")
+                self.addExceptionNone(db, id, "mileage")
 
-        #create_at 采集日期
-        if data['create_at'] is not None:
-            if data['create_at'].strftime('%Y') >= "2014":
-                pass
+            #price 价格
+            if data['price'] is not None:
+                if data["price"] >= 0 and data["price"] <= 10000000:
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "price")
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "create_at")
+                self.addExceptionNone(db, id, "price")
 
-            delta = datetime.now() - data['create_at']
-            if delta.days < 0:
-                self.sign = False
-                self.addExceptionError(db, id, "create_at")
+            #create_at 采集日期
+            if data['create_at'] is not None:
+                if data['create_at'].strftime('%Y') >= "2014":
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "create_at")
 
-            month = datetime.strftime(data['create_at'],'%m')
-            if month < 1 and month > 12:
-                self.sign = False
-                self.addExceptionError(db, id, "create_at")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "create_at")
+                delta = datetime.now() - data['create_at']
+                if delta.days < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "create_at")
 
-        #date.release_date 发布日起
-        if data['date.release_date'] is not None:
-            if data['date.release_date'].strftime('%Y') >= "1980":
-                pass
+                month = datetime.strftime(data['create_at'],'%m')
+                if month < 1 and month > 12:
+                    self.sign = False
+                    self.addExceptionError(db, id, "create_at")
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "date.release_date")
+                self.addExceptionNone(db, id, "create_at")
 
-            delta = datetime.now() - data['date.release_date']
-            if delta.days < 0:
-                self.sign = False
-                self.addExceptionError(db, id, "date.release_date")
+            #date.release_date 发布日起
+            if data['date.release_date'] is not None:
+                if data['date.release_date'].strftime('%Y') >= "1980":
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.release_date")
 
-            month = datetime.strftime(data['date.release_date'],'%m')
-            if month < 1 and month > 12:
-                self.sign = False
-                self.addExceptionError(db, id, "date.release_date")
+                delta = datetime.now() - data['date.release_date']
+                if delta.days < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.release_date")
 
-            delta1 = data['create_at'] - data['date.release_date']
-            if delta1.day < 0:
-                self.sign = False
-                self.addExceptionError(db, id, "date.release_date")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "date.release_date")
+                month = datetime.strftime(data['date.release_date'],'%m')
+                if month < 1 and month > 12:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.release_date")
 
-        #date.registration_date 发布日起
-        if data['date.registration_date'] is not None:
-            if data['date.registration_date'].strftime('%Y') >= "1950":
-                pass
+                delta1 = data['create_at'] - data['date.release_date']
+                if delta1.day < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.release_date")
             else:
                 self.sign = False
-                self.addExceptionError(db, id, "date.registration_date")
+                self.addExceptionNone(db, id, "date.release_date")
 
-            delta = datetime.now() - data['date.registration_date']
-            if delta.days < 0:
+            #date.registration_date 发布日起
+            if data['date.registration_date'] is not None:
+                if data['date.registration_date'].strftime('%Y') >= "1950":
+                    pass
+                else:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.registration_date")
+
+                delta = datetime.now() - data['date.registration_date']
+                if delta.days < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.registration_date")
+
+                month = datetime.strftime(data['date.registration_date'],'%m')
+                if month < 1 and month > 12:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.registration_date")
+
+                delta1 = data['create_at'] - data['date.registration_date']
+                if delta1.day < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.registration_date")
+                delta2 = data['date.release_date'] - data['date.registration_date']
+                if delta2.day < 0:
+                    self.sign = False
+                    self.addExceptionError(db, id, "date.registration_date")
+            else:
                 self.sign = False
-                self.addExceptionError(db, id, "date.registration_date")
+                self.addExceptionNone(db, id, "date.registration_date")
 
-            month = datetime.strftime(data['date.registration_date'],'%m')
-            if month < 1 and month > 12:
-                self.sign = False
-                self.addExceptionError(db, id, "date.registration_date")
+            if self.sign:
+                db.carSrcContent.update({'_id':id},{'$push':{'exceptionFlag':'normal'}})
 
-            delta1 = data['create_at'] - data['date.registration_date']
-            if delta1.day < 0:
-                self.sign = False
-                self.addExceptionError(db, id, "date.registration_date")
-            delta2 = data['date.release_date'] - data['date.registration_date']
-            if delta2.day < 0:
-                self.sign = False
-                self.addExceptionError(db, id, "date.registration_date")
-        else:
-            self.sign = False
-            self.addExceptionNone(db, id, "date.registration_date")
-
-        if self.sign:
-            db.carSrcContent.update({'_id':id},{'$push':{'exceptionFlag':'normal'}})
-
-        print
+            data = db.carSrcContent.find_one({'exceptionFlag':''})
         print self.dicError
         print self.dicNone
+
 
     def addExceptionError(self, db, id, fieldName):
 
@@ -371,6 +372,13 @@ class Checkdata():
                     iList[i][j+1] = 1
 
         print iList
+
+        str1 = u"你好"
+        str2v = u"你好吗"
+        if str1 in str2v:
+            print "success"
+        else:
+            print "nothing"
 
 
     def genMatrix(self,rows,cols):
